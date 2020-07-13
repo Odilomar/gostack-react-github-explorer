@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from "react";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useHistory } from "react-router-dom";
 
 interface User {
     name: string;
@@ -25,6 +26,8 @@ const Login = () => {
         { value: "admin", label: "Administrador do Sistema" },
     ];
 
+    const history = useHistory();
+
     const handleInputChange = (inputName: ChangeEvent<HTMLInputElement>) => {
         const { value } = inputName.target;
 
@@ -43,6 +46,7 @@ const Login = () => {
 
     const signIn = () => {
         console.log(user);
+        history.push('/dashboard');
     }
 
     return (
