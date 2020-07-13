@@ -1,9 +1,8 @@
 import React, { useState, ChangeEvent } from "react";
 import { useHistory } from "react-router-dom";
 
-import axios from 'axios';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
+import api from "../../service/api";
 
 interface User {
     name: string;
@@ -55,7 +54,7 @@ const Login = () => {
 
         const data = { "Nome": user.name, "Role": user.role };
 
-        const loginResponse = await axios.post('https://localhost:44307/v1/account/login', data);
+        const loginResponse = await api.post('/v1/account/login', data);
 
         if (loginResponse.status === 404) {
             alert("Usuário não encontrado. Verifique seus dados e tente novamente!");
