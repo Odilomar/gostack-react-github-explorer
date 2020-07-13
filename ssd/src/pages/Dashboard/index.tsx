@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
@@ -7,7 +7,7 @@ import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
 import api from "../../service/api";
 
 interface Systems {
-    id: string;
+    id: number;
     description: string;
     initials: string;
     email: string;
@@ -16,7 +16,7 @@ interface Systems {
 }
 
 interface SystemsResponse {
-    id: string;
+    id: number;
     descricao: string;
     sigla: string;
     email: string;
@@ -39,7 +39,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         handleDataFromAPI();
-        // const dashboardResponse = await 
     }, [token]);
 
     const handleDataFromAPI = async () => {
@@ -88,6 +87,10 @@ const Dashboard = () => {
         console.log(systemsResponse);
     }
 
+    const handleEditSystem = (id: number) => {
+        history.push(`/dashboard/${id}`);
+    }
+
     return (
         <div className="container">
             <div className="row mt-4">
@@ -123,13 +126,13 @@ const Dashboard = () => {
                                         <th scope="row">{index + 1}</th>
                                         <td>{system.description}</td>
                                         <td>{system.initials}</td>
-                                        <td>@{system.email}</td>
+                                        <td>{system.email}</td>
                                         <td>{system.url}</td>
                                         <td>{system.status === undefined ? '' : system.status ? "Ativo" : "Cancelado"}</td>
                                         <td>
-                                            <button type="button" className="btn btn-info">
+                                            <Link to={`/edit/${system.id}`} className='btn btn-info'>
                                                 <FontAwesomeIcon icon={faEdit} />
-                                            </button>
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))
