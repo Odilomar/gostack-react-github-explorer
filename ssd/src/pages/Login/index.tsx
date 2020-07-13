@@ -1,7 +1,9 @@
 import React, { useState, ChangeEvent } from "react";
+import { useHistory } from "react-router-dom";
+
+import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useHistory } from "react-router-dom";
 
 interface User {
     name: string;
@@ -44,8 +46,31 @@ const Login = () => {
         setUser({ name, role });
     }
 
-    const signIn = () => {
-        console.log(user);
+    const signIn = async () => {
+
+        if (user.name === '' || user.role === '') {
+            alert("Dados inválidos. Corrija os dados e Tente novamente!");
+            return;
+        }
+
+        const data = { "Nome": user.name, "Role": user.role };
+
+        const loginResponse = await axios.post('https://localhost:44307/v1/account/login', data);
+
+        if (loginResponse.status === 404) {
+            alert("Usuário não encontrado. Verifique seus dados e tente novamente!");
+            return;
+        }
+
+        if (loginResponse.status === 500) {
+            alert("Problemas com o servidor. Tente novamente mais tarde!");
+            return;
+        }
+
+        const { token } = loginResponse.data;
+
+        window.localStorage.setItem("token", token);
+
         history.push('/dashboard');
     }
 
