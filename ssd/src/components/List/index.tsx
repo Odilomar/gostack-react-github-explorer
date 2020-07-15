@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
+import Systems from "../../interface/Systems.interface";
+
 import api from "../../service/api";
+import { ShowListContext } from "../../App";
+import { EditSystemContext } from "../../pages/Dashboard";
 
-interface Systems {
-  id: number;
-  description: string;
-  initials: string;
-  email: string;
-  url: string;
-  status?: boolean;
-}
-
-interface SystemsResponse {
+export interface SystemsResponse {
   id: number;
   descricao: string;
   sigla: string;
@@ -23,10 +17,18 @@ interface SystemsResponse {
   status?: boolean;
 }
 
+// Create Context
+const useShowList = () => useContext(ShowListContext);
+const useIdSystem = () => useContext(EditSystemContext);
+
 const List = () => {
   const [token, setToken] = useState("");
   const [systems, setSystems] = useState<Systems[]>([]);
-  
+
+  // Create Context State
+  const { showList, setShowList } = useShowList()!;
+  const { idSystem, setIdSystem } = useIdSystem()!;
+
   useEffect(() => {
     const tempToken: string = window.localStorage.getItem("token") || "";
 
@@ -76,42 +78,71 @@ const List = () => {
   };
 
   return (
-    <table className="table">
-      <thead className="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Descrição</th>
-          <th scope="col">Sigla</th>
-          <th scope="col">Email de atendimento</th>
-          <th scope="col">URL</th>
-          <th scope="col">Status</th>
-          <th scope="col">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {systems.map((system, index) => (
-          <tr key={system.id}>
-            <th scope="row">{index + 1}</th>
-            <td>{system.description}</td>
-            <td>{system.initials}</td>
-            <td>{system.email}</td>
-            <td>{system.url}</td>
-            <td>
-              {system.status === undefined
-                ? ""
-                : system.status
-                ? "Ativo"
-                : "Cancelado"}
-            </td>
-            <td>
-              <Link to={`/edit/${system.id}`} className="btn btn-info">
-                <FontAwesomeIcon icon={faEdit} />
-              </Link>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <>
+      <div className="row mt-4">
+        <div className="col-10">
+          <h1>Listagem de itens</h1>
+        </div>
+        <div className="col-1 ml-auto">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              setShowList(false);
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <table className="table">
+            <thead className="thead-dark">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Descrição</th>
+                <th scope="col">Sigla</th>
+                <th scope="col">Email de atendimento</th>
+                <th scope="col">URL</th>
+                <th scope="col">Status</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {systems.map((system, index) => (
+                <tr key={system.id}>
+                  <th scope="row">{index + 1}</th>
+                  <td>{system.description}</td>
+                  <td>{system.initials}</td>
+                  <td>{system.email}</td>
+                  <td>{system.url}</td>
+                  <td>
+                    {system.status === undefined
+                      ? ""
+                      : system.status
+                      ? "Ativo"
+                      : "Cancelado"}
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-info"
+                      onClick={() => {
+                        setIdSystem(system.id);
+                        setShowList(false);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
   );
 };
 

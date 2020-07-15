@@ -1,36 +1,47 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import React, { useContext, createContext, useState, useEffect } from "react";
 
 import List from "../../components/List";
+import { ShowListContext } from "../../App";
+import CreateEdit from "../../components/CreateEdit";
+
+interface EditSystem {
+  idSystem: number;
+  setIdSystem: (value: number) => void;
+}
+
+const defaultEditSystem = 0;
+
+export const EditSystemContext = createContext<EditSystem | undefined>(undefined);
+const useShowList = () => useContext(ShowListContext);
 
 const Dashboard = () => {
+  const [idSystem, setIdSystem] = useState(defaultEditSystem);
 
-    // const history = useHistory();
+  const { showList } = useShowList()!;
 
-    return (
-        <div className="container">
-            <div className="row mt-4">
-                <div className="col-10">
-                    <h1>
-                        Dashboard
-                    </h1>
-                </div>
-                <div className="col-1 ml-auto">
-                    <button type='button' className='btn btn-primary'>
-                        <FontAwesomeIcon icon={faPlus} />
-                    </button>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col align-self-center">
-                    <List />
-                </div>
-            </div>
+  useEffect(() => {
+    const idSystemTemp = 0;
+    setIdSystem(idSystemTemp);
+  }, []);
+
+  return (
+    <div className="container">
+      <div className="row mt-4">
+        <div className="col">
+          <h1>Dashboard</h1>
         </div>
-    );
+      </div>
+      <div className="row">
+        <div className="col-3">Search Component</div>
+        <div className="col align-self-center">
+          {/* {window.switchComponents.showList ? <List /> : <CreateEdit />} */}
+          <EditSystemContext.Provider value={{ idSystem, setIdSystem }}>
+            {showList ? <List /> : <CreateEdit />}
+          </EditSystemContext.Provider>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;
