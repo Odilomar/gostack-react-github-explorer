@@ -1,17 +1,12 @@
-import React, { useContext, createContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 
-import List from "../../components/List";
-import { ShowListContext } from "../../App";
+import { EditSystemContext } from "../../context/EditSystemContext";
+import { ShowListContext } from "../../context/ShowListContext";
 import CreateEdit from "../../components/CreateEdit";
-
-interface EditSystem {
-  idSystem: number;
-  setIdSystem: (value: number) => void;
-}
+import List from "../../components/List";
 
 const defaultEditSystem = 0;
 
-export const EditSystemContext = createContext<EditSystem | undefined>(undefined);
 const useShowList = () => useContext(ShowListContext);
 
 const Dashboard = () => {
@@ -34,7 +29,6 @@ const Dashboard = () => {
       <div className="row">
         <div className="col-3">Search Component</div>
         <div className="col align-self-center">
-          {/* {window.switchComponents.showList ? <List /> : <CreateEdit />} */}
           <EditSystemContext.Provider value={{ idSystem, setIdSystem }}>
             {showList ? <List /> : <CreateEdit />}
           </EditSystemContext.Provider>

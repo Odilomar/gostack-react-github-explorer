@@ -1,22 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import Router from "./router";
 
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-//Context
+import "./App.css";
+import { ShowListContext } from "./context/ShowListContext";
 
 const defaultShowList = true;
-
-interface ShowListComponent {
-  showList: boolean;
-  setShowList: (value: boolean) => void;
-}
-
-export const ShowListContext = createContext<ShowListComponent | undefined>(
-  undefined
-);
 
 function App() {
   const [showList, setShowList] = useState(defaultShowList);

@@ -1,23 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Systems from "../../interface/Systems.interface";
 
+import SystemsResponse from "../../interface/SystemsResponse.interface";
+import { EditSystemContext } from "../../context/EditSystemContext";
+import { ShowListContext } from "../../context/ShowListContext";
 import api from "../../service/api";
-import { ShowListContext } from "../../App";
-import { EditSystemContext } from "../../pages/Dashboard";
 
-export interface SystemsResponse {
-  id: number;
-  descricao: string;
-  sigla: string;
-  email: string;
-  url: string;
-  status?: boolean;
-}
-
-// Create Context
 const useShowList = () => useContext(ShowListContext);
 const useIdSystem = () => useContext(EditSystemContext);
 
@@ -25,9 +16,8 @@ const List = () => {
   const [token, setToken] = useState("");
   const [systems, setSystems] = useState<Systems[]>([]);
 
-  // Create Context State
-  const { showList, setShowList } = useShowList()!;
-  const { idSystem, setIdSystem } = useIdSystem()!;
+  const { setShowList } = useShowList()!;
+  const { setIdSystem } = useIdSystem()!;
 
   useEffect(() => {
     const tempToken: string = window.localStorage.getItem("token") || "";
@@ -59,7 +49,7 @@ const List = () => {
 
     const systemsTemp = [...systems];
 
-    systemsResponse.data.map(
+    (systemsResponse.data as SystemsResponse[]).map(
       ({ id, descricao, sigla, email, url, status }: SystemsResponse) => {
         systemsTemp.push({
           id,
@@ -73,8 +63,6 @@ const List = () => {
     );
 
     setSystems(systemsTemp);
-
-    console.log(systemsResponse);
   };
 
   return (

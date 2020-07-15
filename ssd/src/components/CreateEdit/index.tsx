@@ -1,29 +1,22 @@
 import React, { useContext, useState, useEffect } from "react";
 
+import SystemsResponse from "../../interface/SystemsResponse.interface";
+import { EditSystemContext } from "../../context/EditSystemContext";
+import { ShowListContext } from "../../context/ShowListContext";
 import Systems from "../../interface/Systems.interface";
-import { ShowListContext } from "../../App";
-import { EditSystemContext } from "../../pages/Dashboard";
 import api from "../../service/api";
-import { SystemsResponse } from "../List";
 
-interface CreateEditProps {
-  user?: Systems;
-}
-
-// Create Context
 const useShowList = () => useContext(ShowListContext);
 const useEditSystem = () => useContext(EditSystemContext);
 
-const CreateEdit = ({ user }: CreateEditProps) => {
+const CreateEdit = () => {
   const [system, setSystem] = useState<Systems>();
+  const [token, setToken] = useState("");
 
-  // Create Context State
-  const { showList, setShowList } = useShowList()!;
+  const { setShowList } = useShowList()!;
   const { idSystem, setIdSystem } = useEditSystem()!;
 
   useEffect(() => {
-    console.log(`Edit: ${idSystem}`);
-
     if (idSystem === 0) return;
 
     const token = window.localStorage.getItem("token");
@@ -33,15 +26,19 @@ const CreateEdit = ({ user }: CreateEditProps) => {
       return;
     }
 
-    handleSystemGetById(token);
+    setToken(token);
   }, []);
+
+  useEffect(() => {
+    handleSystemGetById();
+  }, [token]);
 
   const handleResetPage = () => {
     setIdSystem(0);
     setShowList(true);
   };
 
-  const handleSystemGetById = async (token: string) => {
+  const handleSystemGetById = async () => {
     const systemResponse = await api.get(`/v1/products/${idSystem}`, {
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +70,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
       id: systemResponseTemp.id,
       url: systemResponseTemp.url,
       status: systemResponseTemp.status,
-    }
+    };
 
     setSystem(system);
   };
@@ -97,6 +94,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
                     className="form-control"
                     placeholder="Siglas"
                     value={idSystem > 0 && system ? system.initials : ""}
+                    onChange={() => {}}
                   />
                 </div>
               </div>
@@ -108,6 +106,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
                     className="form-control"
                     placeholder="Email"
                     value={idSystem > 0 && system ? system.email : ""}
+                    onChange={() => {}}
                   />
                 </div>
               </div>
@@ -121,6 +120,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
                     className="form-control"
                     placeholder="Url"
                     value={idSystem > 0 && system ? system.url : ""}
+                    onChange={() => {}}
                   />
                 </div>
               </div>
@@ -139,6 +139,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
                       //   ? "Ativo"
                       //   : "Cancelado"
                     }
+                    onChange={() => {}}
                   />
                 </div>
               </div>
@@ -150,6 +151,7 @@ const CreateEdit = ({ user }: CreateEditProps) => {
                 className="form-control"
                 placeholder="Description"
                 value={idSystem > 0 && system ? system.description : ""}
+                onChange={() => {}}
               />
             </div>
             <div className="form-group">
