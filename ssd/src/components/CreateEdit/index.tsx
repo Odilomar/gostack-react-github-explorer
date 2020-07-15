@@ -6,6 +6,11 @@ import { ShowListContext } from "../../context/ShowListContext";
 import Systems from "../../interface/Systems.interface";
 import api from "../../service/api";
 
+interface SelectOptions {
+  value: string;
+  label: string;
+}
+
 const useShowList = () => useContext(ShowListContext);
 const useEditSystem = () => useContext(EditSystemContext);
 
@@ -15,6 +20,12 @@ const CreateEdit = () => {
 
   const { setShowList } = useShowList()!;
   const { idSystem, setIdSystem } = useEditSystem()!;
+
+  const options: SelectOptions[] = [
+    { value: "", label: "Sem status" },
+    { value: "true", label: "Ativo" },
+    { value: "false", label: "Cancelado" },
+  ];
 
   useEffect(() => {
     if (idSystem === 0) return;
@@ -126,21 +137,13 @@ const CreateEdit = () => {
               </div>
               <div className="col-6">
                 <div className="form-group">
-                  <input
-                    type="text"
-                    id="status"
-                    className="form-control"
-                    placeholder="Status"
-                    value={
-                      ""
-                      // idSystem === 0 || system.status === undefined || system
-                      //   ? " "
-                      //   : system.status
-                      //   ? "Ativo"
-                      //   : "Cancelado"
-                    }
-                    onChange={() => {}}
-                  />
+                  <select className="form-control" onChange={() => {}}>
+                    {options.map((option) => (
+                      <option key={option.value} value={option.value} selected={option.value === `${system?.status}`? true : false}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
