@@ -27,7 +27,7 @@ const CreateEdit = () => {
 
   const { setShowList } = useShowList()!;
   const { idSystem, setIdSystem } = useEditSystem()!;
-  
+
   const history = useHistory();
 
   const options: SelectOptions[] = [
@@ -59,6 +59,8 @@ const CreateEdit = () => {
   };
 
   const handleSystemGetById = async () => {
+    if (token === undefined || token === "") return;
+
     const systemResponse = await api.get(`/v1/products/${idSystem}`, {
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +98,7 @@ const CreateEdit = () => {
   };
 
   const handleCreateOrEditSystem = async () => {
-    if(token === undefined || token === '') history.push('/');
+    if (token === undefined || token === "") history.push("/");
 
     const header = {
       headers: {
@@ -139,7 +141,7 @@ const CreateEdit = () => {
   };
 
   return (
-    <div className="container">
+    <>
       <div className="row">
         <div className="col">
           {idSystem > 0 ? <h1>Editar Sistemas</h1> : <h1>Criar Sistemas</h1>}
@@ -281,7 +283,7 @@ const CreateEdit = () => {
           </form>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

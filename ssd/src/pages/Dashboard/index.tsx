@@ -27,7 +27,6 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="row">
-        <div className="col-3">Search Component</div>
         <div className="col align-self-center">
           <EditSystemContext.Provider value={{ idSystem, setIdSystem }}>
             {showList ? <List /> : <CreateEdit />}
