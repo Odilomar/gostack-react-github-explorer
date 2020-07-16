@@ -5,6 +5,7 @@ import { EditSystemContext } from "../../context/EditSystemContext";
 import { ShowListContext } from "../../context/ShowListContext";
 import Systems from "../../interface/Systems.interface";
 import api from "../../service/api";
+import { useHistory } from "react-router-dom";
 
 interface SelectOptions {
   value: string;
@@ -15,11 +16,19 @@ const useShowList = () => useContext(ShowListContext);
 const useEditSystem = () => useContext(EditSystemContext);
 
 const CreateEdit = () => {
-  const [system, setSystem] = useState<Systems>();
+  const [system, setSystem] = useState<Systems>({
+    description: "",
+    email: "",
+    id: 0,
+    initials: "",
+    url: "",
+  });
   const [token, setToken] = useState("");
 
   const { setShowList } = useShowList()!;
   const { idSystem, setIdSystem } = useEditSystem()!;
+  
+  const history = useHistory();
 
   const options: SelectOptions[] = [
     { value: "", label: "Sem status" },
@@ -86,6 +95,49 @@ const CreateEdit = () => {
     setSystem(system);
   };
 
+  const handleCreateOrEditSystem = async () => {
+    if(token === undefined || token === '') history.push('/');
+
+    const header = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ik9kaWxvbWFyIiwicm9sZSI6ImFkbWluIiwibmJmIjoxNTk0OTA5MDc1LCJleHAiOjE1OTQ5MTI2NzUsImlhdCI6MTU5NDkwOTA3NX0.NqARtYgoKAoqa8r_zYkFNDsrWKjhPdeRiE-RYemuLFc`,
+      },
+    };
+
+    const systemUpdate: SystemsResponse = {
+      descricao: system.description,
+      email: system.email,
+      id: system.id,
+      sigla: system.initials,
+      url: system.url,
+      status: system.status,
+    };
+
+    const systemResponse =
+      system.id === 0
+        ? await api.post("/v1/products/admin", systemUpdate, header)
+        : await api.put(
+            `/v1/products/updating/${system.id}`,
+            systemUpdate,
+            header
+          );
+
+    const userMessage =
+      system.id === 0
+        ? "Sistema cadastrado com sucesso!"
+        : "Sistema atualizado com sucesso!";
+
+    if (systemResponse.status === 400) {
+      alert("Verifique os seus dados e tente novamente");
+      // return;
+    }
+
+    alert(userMessage);
+    // setShowList(true);
+  };
+
   return (
     <div className="container">
       <div className="row">
@@ -95,7 +147,13 @@ const CreateEdit = () => {
       </div>
       <div className="row">
         <div className="col">
-          <form action="">
+          <form
+            action=""
+            onSubmit={(form) => {
+              form.preventDefault();
+              handleCreateOrEditSystem();
+            }}
+          >
             <div className="row">
               <div className="col-6">
                 <div className="form-group">
@@ -104,20 +162,33 @@ const CreateEdit = () => {
                     id="initials"
                     className="form-control"
                     placeholder="Siglas"
-                    value={idSystem > 0 && system ? system.initials : ""}
-                    onChange={() => {}}
+                    defaultValue={idSystem > 0 && system ? system.initials : ""}
+                    maxLength={10}
+                    onChange={(initials) => {
+                      console.log(initials.target.value, system);
+                      let systemTemp = system;
+                      systemTemp.initials = initials.target.value;
+                      setSystem(system);
+                    }}
+                    required
                   />
                 </div>
               </div>
               <div className="col-6">
                 <div className="form-group">
                   <input
-                    type="text"
+                    type="email"
                     id="email"
                     className="form-control"
                     placeholder="Email"
-                    value={idSystem > 0 && system ? system.email : ""}
-                    onChange={() => {}}
+                    defaultValue={idSystem > 0 && system ? system.email : ""}
+                    maxLength={100}
+                    onChange={(email) => {
+                      let systemTemp = system;
+                      systemTemp.email = email.target.value;
+                      setSystem(systemTemp);
+                    }}
+                    required
                   />
                 </div>
               </div>
@@ -130,16 +201,41 @@ const CreateEdit = () => {
                     id="url"
                     className="form-control"
                     placeholder="Url"
-                    value={idSystem > 0 && system ? system.url : ""}
-                    onChange={() => {}}
+                    defaultValue={idSystem > 0 && system ? system.url : ""}
+                    maxLength={50}
+                    onChange={(url) => {
+                      let systemTemp = system;
+                      systemTemp.url = url.target.value;
+                      setSystem(systemTemp);
+                    }}
+                    required
                   />
                 </div>
               </div>
               <div className="col-6">
                 <div className="form-group">
-                  <select className="form-control" onChange={() => {}}>
+                  <select
+                    className="form-control"
+                    defaultValue={
+                      system.id === 0 || system.status === undefined
+                        ? ""
+                        : `${system.status}`
+                    }
+                    onChange={(status) => {
+                      const statusOption = status.target.value;
+                      let systemTemp = system;
+
+                      systemTemp.status =
+                        statusOption === "true"
+                          ? true
+                          : statusOption === "false"
+                          ? false
+                          : undefined;
+                      setSystem(systemTemp);
+                    }}
+                  >
                     {options.map((option) => (
-                      <option key={option.value} value={option.value} selected={option.value === `${system?.status}`? true : false}>
+                      <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
                     ))}
@@ -152,9 +248,15 @@ const CreateEdit = () => {
                 id="description"
                 rows={5}
                 className="form-control"
-                placeholder="Description"
-                value={idSystem > 0 && system ? system.description : ""}
-                onChange={() => {}}
+                placeholder="Descrição"
+                defaultValue={idSystem > 0 && system ? system.description : ""}
+                maxLength={100}
+                onChange={(description) => {
+                  let systemTemp = system;
+                  systemTemp.description = description.target.value;
+                  setSystem(systemTemp);
+                }}
+                required
               />
             </div>
             <div className="form-group">
