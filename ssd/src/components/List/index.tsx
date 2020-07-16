@@ -13,24 +13,23 @@ const useShowList = () => useContext(ShowListContext);
 const useIdSystem = () => useContext(EditSystemContext);
 
 const List = () => {
-  const [token, setToken] = useState("");
   const [systems, setSystems] = useState<Systems[]>([]);
 
   const { setShowList } = useShowList()!;
   const { setIdSystem } = useIdSystem()!;
 
   useEffect(() => {
-    const tempToken: string = window.localStorage.getItem("token") || "";
-
-    setToken(tempToken);
+    handleDataFromAPI();
   }, []);
 
-  useEffect(() => {
-    handleDataFromAPI();
-  }, [token]);
+  const handleGetToken = (): string => {
+    const token: string = window.localStorage.getItem("token") || "";
+
+    return token;
+  }
 
   const handleDataFromAPI = async () => {
-    if (token === "") return;
+    const token = handleGetToken();
 
     const systemsResponse = await api.get("/v1/products/authenticated", {
       headers: {
@@ -68,7 +67,7 @@ const List = () => {
   };
 
   const handleDeleteSystem = async (idSystem: number) => {
-    if (token === undefined || token === "") return;
+    const token = handleGetToken();
 
     const systemResponse = await api.delete(`/v1/products/delete/${idSystem}`, {
       headers: {

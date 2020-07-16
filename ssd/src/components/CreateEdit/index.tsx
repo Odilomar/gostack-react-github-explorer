@@ -5,7 +5,8 @@ import { EditSystemContext } from "../../context/EditSystemContext";
 import { ShowListContext } from "../../context/ShowListContext";
 import Systems from "../../interface/Systems.interface";
 import api from "../../service/api";
-import { useHistory } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 
 interface SelectOptions {
   value: string;
@@ -23,12 +24,9 @@ const CreateEdit = () => {
     initials: "",
     url: "",
   });
-  const [token, setToken] = useState("");
 
   const { setShowList } = useShowList()!;
   const { idSystem, setIdSystem } = useEditSystem()!;
-
-  const history = useHistory();
 
   const options: SelectOptions[] = [
     { value: "", label: "Sem status" },
@@ -37,21 +35,8 @@ const CreateEdit = () => {
   ];
 
   useEffect(() => {
-    if (idSystem === 0) return;
-
-    const token = window.localStorage.getItem("token");
-
-    if (!token) {
-      handleResetPage();
-      return;
-    }
-
-    setToken(token);
-  }, []);
-
-  useEffect(() => {
     handleSystemGetById();
-  }, [token]);
+  });
 
   const handleResetPage = () => {
     setIdSystem(0);
@@ -59,7 +44,9 @@ const CreateEdit = () => {
   };
 
   const handleSystemGetById = async () => {
-    if (token === undefined || token === "") return;
+    if (idSystem === 0) return;
+
+    const token = handleGetToken();
 
     const systemResponse = await api.get(`/v1/products/${idSystem}`, {
       headers: {
@@ -97,14 +84,23 @@ const CreateEdit = () => {
     setSystem(system);
   };
 
+  const handleGetToken = (): string => {
+    const token = window.localStorage.getItem("token");
+
+    if (!token) {
+      handleResetPage();
+    }
+
+    return token || "";
+  };
+
   const handleCreateOrEditSystem = async () => {
-    if (token === undefined || token === "") history.push("/");
+    const token = handleGetToken();
 
     const header = {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        // Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ik9kaWxvbWFyIiwicm9sZSI6ImFkbWluIiwibmJmIjoxNTk0OTA5MDc1LCJleHAiOjE1OTQ5MTI2NzUsImlhdCI6MTU5NDkwOTA3NX0.NqARtYgoKAoqa8r_zYkFNDsrWKjhPdeRiE-RYemuLFc`,
       },
     };
 
@@ -133,11 +129,11 @@ const CreateEdit = () => {
 
     if (systemResponse.status === 400) {
       alert("Verifique os seus dados e tente novamente");
-      // return;
+      return;
     }
 
     alert(userMessage);
-    // setShowList(true);
+    setShowList(true);
   };
 
   return (
@@ -158,110 +154,144 @@ const CreateEdit = () => {
           >
             <div className="row">
               <div className="col-6">
-                <div className="form-group">
-                  <input
-                    type="text"
-                    id="initials"
-                    className="form-control"
-                    placeholder="Siglas"
-                    defaultValue={idSystem > 0 && system ? system.initials : ""}
-                    maxLength={10}
-                    onChange={(initials) => {
-                      console.log(initials.target.value, system);
-                      let systemTemp = system;
-                      systemTemp.initials = initials.target.value;
-                      setSystem(system);
-                    }}
-                    required
-                  />
+                <div className="form-row mt-3">
+                  <div className="col">
+                    <input
+                      type="text"
+                      id="initials"
+                      className="form-control"
+                      placeholder="Siglas"
+                      defaultValue={
+                        idSystem > 0 && system ? system.initials : ""
+                      }
+                      maxLength={10}
+                      onChange={(initials) => {
+                        let systemTemp = system;
+                        systemTemp.initials = initials.target.value;
+                        setSystem(system);
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="initials" className="text-danger ml-2">
+                    *
+                  </label>
                 </div>
               </div>
               <div className="col-6">
-                <div className="form-group">
-                  <input
-                    type="email"
-                    id="email"
-                    className="form-control"
-                    placeholder="Email"
-                    defaultValue={idSystem > 0 && system ? system.email : ""}
-                    maxLength={100}
-                    onChange={(email) => {
-                      let systemTemp = system;
-                      systemTemp.email = email.target.value;
-                      setSystem(systemTemp);
-                    }}
-                    required
-                  />
+                <div className="form-row mt-3">
+                  <div className="col">
+                    <input
+                      type="email"
+                      id="email"
+                      className="form-control"
+                      placeholder="Email"
+                      defaultValue={idSystem > 0 && system ? system.email : ""}
+                      maxLength={100}
+                      onChange={(email) => {
+                        let systemTemp = system;
+                        systemTemp.email = email.target.value;
+                        setSystem(systemTemp);
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="email" className="text-danger ml-2">
+                    *
+                  </label>
                 </div>
               </div>
             </div>
             <div className="row">
               <div className="col-6">
-                <div className="form-group">
-                  <input
-                    type="text"
-                    id="url"
-                    className="form-control"
-                    placeholder="Url"
-                    defaultValue={idSystem > 0 && system ? system.url : ""}
-                    maxLength={50}
-                    onChange={(url) => {
-                      let systemTemp = system;
-                      systemTemp.url = url.target.value;
-                      setSystem(systemTemp);
-                    }}
-                    required
-                  />
+                <div className="form-row mt-3">
+                  <div className="col">
+                    <input
+                      type="text"
+                      id="url"
+                      className="form-control"
+                      placeholder="Url"
+                      defaultValue={idSystem > 0 && system ? system.url : ""}
+                      maxLength={50}
+                      onChange={(url) => {
+                        let systemTemp = system;
+                        systemTemp.url = url.target.value;
+                        setSystem(systemTemp);
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="url" className="text-danger ml-2">
+                    *
+                  </label>
                 </div>
               </div>
               <div className="col-6">
-                <div className="form-group">
-                  <select
-                    className="form-control"
-                    defaultValue={
-                      system.id === 0 || system.status === undefined
-                        ? ""
-                        : `${system.status}`
-                    }
-                    onChange={(status) => {
-                      const statusOption = status.target.value;
-                      let systemTemp = system;
+                <div className="form-row mt-3">
+                  <div className="col">
+                    <select
+                      className="form-control"
+                      id="status"
+                      defaultValue={
+                        system.id === 0 || system.status === undefined
+                          ? ""
+                          : `${system.status}`
+                      }
+                      onChange={(status) => {
+                        const statusOption = status.target.value;
+                        let systemTemp = system;
 
-                      systemTemp.status =
-                        statusOption === "true"
-                          ? true
-                          : statusOption === "false"
-                          ? false
-                          : undefined;
-                      setSystem(systemTemp);
-                    }}
-                  >
-                    {options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                        systemTemp.status =
+                          statusOption === "true"
+                            ? true
+                            : statusOption === "false"
+                            ? false
+                            : undefined;
+                        setSystem(systemTemp);
+                      }}
+                    >
+                      {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <label htmlFor="status" className="text-danger ml-2">
+                    *
+                  </label>
                 </div>
               </div>
             </div>
-            <div className="form-group">
-              <textarea
-                id="description"
-                rows={5}
-                className="form-control"
-                placeholder="Descrição"
-                defaultValue={idSystem > 0 && system ? system.description : ""}
-                maxLength={100}
-                onChange={(description) => {
-                  let systemTemp = system;
-                  systemTemp.description = description.target.value;
-                  setSystem(systemTemp);
-                }}
-                required
-              />
+            <div className="form-row mt-3">
+              <div className="col">
+                <textarea
+                  id="description"
+                  rows={3}
+                  className="form-control"
+                  placeholder="Descrição"
+                  defaultValue={
+                    idSystem > 0 && system ? system.description : ""
+                  }
+                  maxLength={100}
+                  onChange={(description) => {
+                    let systemTemp = system;
+                    systemTemp.description = description.target.value;
+                    setSystem(systemTemp);
+                  }}
+                  required
+                />
+              </div>
+
+              <label htmlFor="description" className="text-danger ml-2">
+                *
+              </label>
             </div>
-            <div className="form-group">
+            <div className="form-group mt-3">
               <div className="row">
                 <div className="col-6">
                   <button
@@ -275,8 +305,11 @@ const CreateEdit = () => {
                     Cancelar
                   </button>
                 </div>
-                <div className="col-6 ml-auto">
-                  <button className="btn btn-primary">Salvar</button>
+                <div className="col-6 d-flex align-content-center flex-wrap">
+                  <button className="btn btn-success ml-auto">
+                    <FontAwesomeIcon icon={faSave} />
+                    <span className='ml-2'>Salvar</span>
+                  </button>
                 </div>
               </div>
             </div>
